@@ -21,7 +21,10 @@ int main() {
     std::cout << "\n\nLeitura do Grafo em Lista de Adjacências\n\n";
     u.writeGraphLista(1,Vet);
     pre.orderByAdjacencies(Vet);
-    std::cout << "\n\nGrafo possui cliques?"<< u.hasclique(5,Vet) << "\n\n";
-    std::cout << "\n\nMaior cliques?"<< u.cliquesize(5,Vet) << "\n\n";
+    std::cout << "\n\nGrafo possui cliques?"<< u.hasclique(n,Vet) << "\n\n";
+    std::cout << "\n\nMaior cliques?"<< u.cliquesize(n,Vet) << "\n\n";
+    std::cout << "\n\nOrdens:\n";
+    u.imprimeOrdem(n,Vet);
+
     return 0;
 }

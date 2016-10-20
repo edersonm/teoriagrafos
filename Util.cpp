@@ -53,12 +53,13 @@ void Util::readFileLista(string arquivo,int *n,VertexType Vet[]){
                     line=line.substr(temp+1);
                     Vet[v].Adj.push_back(u);
                     Vet[u].Adj.push_back(v);
-                    Vet[v].l++;
-                    Vet[u].l++;
                 }
             }
         }
         myfile.close();
+        for(i=1;i!=*n;i++){
+            Vet[i].l = Vet[i].Adj.size();
+        }
     }
     else cout << "Unable to open file";
 }
