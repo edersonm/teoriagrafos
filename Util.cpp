@@ -267,7 +267,3 @@ void Util::ordenatop(int u,int n,VertexType Vet[],CList * L){
 Util::Util(int maxV) {
     maxVert = maxV;
 }
-
-void Util::orderByAdjacencies(list<VertexType> *vet){
-    vet.sort([](const VertexType& a, const VertexType& b) { return a.l < b.l; });
-}
