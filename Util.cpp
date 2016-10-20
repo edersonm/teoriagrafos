@@ -52,6 +52,9 @@ void Util::readFileLista(string arquivo,int *n,VertexType Vet[]){
                     u=GetStr2Int(line.substr(0,temp));
                     line=line.substr(temp+1);
                     Vet[v].Adj.push_back(u);
+                    Vet[u].Adj.push_back(v);
+                    Vet[v].l++;
+                    Vet[u].l++;
                 }
             }
         }
@@ -169,6 +172,7 @@ int Util::commonMembers(list <int> a, list <int> b){
          for(it2 = b.begin();it2!=b.end();it2++){
             if(*it1== *it2){
                 retorno++;
+                break;
             }
         }
     }
@@ -199,15 +203,16 @@ int Util::cliquesize(int n, VertexType Vet[]){
     bool teste = false;
     int i,u;
     list<int>:: iterator it;
-    int cont = 0;
     for (i=n; i>2; i--){
         for (it=Vet[i].Adj.begin(); it!=Vet[i].Adj.end(); it++){
             u=*it;
             int temp = commonMembers(Vet[i].Adj,Vet[u].Adj);
-            cont = temp > cont ? temp : cont;
+            //std::cout << "\ncaso:"<<n<<"  "<<temp << "\n";
+            retorno = temp > retorno ? temp : retorno;
         }
     }
-return retorno;
+
+return retorno == 0 ? retorno:retorno+1;
 }
 
 

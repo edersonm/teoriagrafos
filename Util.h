@@ -19,6 +19,7 @@ public :
         bool visitado; 	// indica se o vértice já foi visitado na DFS
         int p;			// indica o pai/predecessor do vértice na DFS
         int d;			// número DFS
+        int l;
     } VertexType;
     typedef struct CList {
         int a;			// first!
