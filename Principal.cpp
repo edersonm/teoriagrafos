@@ -17,7 +17,7 @@ int main() {
     u.readFileLista(arquivo,&n,Vet);
     cout << "Lendo arquivo: " <<arquivo << endl;
     std::cout << "\n\nLeitura do Grafo em Lista de Adjacências\n\n";
-    u.writeGraphLista(1,Vet);
+    u.writeGraphLista(n,Vet);
     std::cout << "\n\nGrafo possui cliques?"<< u.hasclique(5,Vet) << "\n\n";
     std::cout << "\n\nMaior cliques?"<< u.cliquesize(5,Vet) << "\n\n";
     return 0;
