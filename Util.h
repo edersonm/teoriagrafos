@@ -31,7 +31,7 @@ public :
     void readFileLista(std::string arquivo ,int *n,VertexType Vet[]);
     void writeGraphLista(int n,VertexType Vet[] );
     void inserePrimeiro(CList * L , int u );
-
+    void imprimeOrdem(int n,VertexType Vet[] );
     void writeCList(CList * C );
     void bfs(int s,int n,VertexType Vet[]);
     bool isConnected(int n,VertexType Vet[]);

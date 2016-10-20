@@ -215,6 +215,12 @@ int Util::cliquesize(int n, VertexType Vet[]){
 
 return retorno == 0 ? retorno:retorno+1;
 }
+void Util::imprimeOrdem(int n, VertexType *Vet) {
+    int i;
+    for(i =1;i!=n;i++ ){
+        std::cout << "Ordem de:"<<i<<":  "<<Vet[i].l << "\n";
+    }
+}
 
 
 // DFS começando a partir do vértice s
