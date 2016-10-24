@@ -3,6 +3,7 @@
 //
 #include<string>
 #include<list>
+#include<vector>
 
 #ifndef PROJETOTG_UTIL_H
 #define PROJETOTG_UTIL_H
@@ -25,6 +26,12 @@ public :
         int a;			// first!
         struct CList* b;			// second!
     } CList;
+    typedef struct {
+        int node;
+        std::list<int> adj;
+        int degree;
+    } Vertex;
+
     //with default value
     int GetStr2Int(std::string strConvert = "");
     std::string GetInt2Str(int intConvert= 0);
@@ -42,6 +49,21 @@ public :
     bool hasclique(int n, VertexType Vet[]);
     int cliquesize(int n, VertexType Vet[]);
     Util(int maxV);
+
+    static int getn(std::string fileName);
+
+
+    static Vertex *readGraph(std::string fileName);
+
+    static bool compareVertexByDegree(Vertex a, Vertex b);
+
+    static void printVertexArray(Vertex *v, int n);
+
+    static bool subsets(Util::Vertex *vertexArray, int n, int k, int start, int currLen, bool* used);
+
+    static bool completeSubgraph(std::vector<Util::Vertex> subgraph);
+
+    static void tentativaExato(Vertex *vertexArray, int n);
 
 };
 #endif //PROJETOTG_UTIL_H

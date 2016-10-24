@@ -1,6 +1,3 @@
-//
-// Created by morps on 10/13/16.
-//
 #include<list>
 #include "Util.h"
 #include "PreProcessing.h"

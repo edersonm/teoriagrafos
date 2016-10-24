@@ -9,6 +9,7 @@
 #include<iostream>
 #include <climits> // para usar INT_MAX
 #include<string>
+#include <vector>
 #include "Util.h"
 using namespace std;
 
@@ -161,7 +162,6 @@ bool Util::isConnected(int n,VertexType Vet[]){
 
         }
     }
-
     return retorno;
 
 }
@@ -273,4 +273,126 @@ void Util::ordenatop(int u,int n,VertexType Vet[],CList * L){
 
 Util::Util(int maxV) {
     maxVert = maxV;
+}
+
+//-------------------------------------------------------------------------------------------------------------
+
+int Util::getn(string fileName){
+    std::ifstream file(fileName.c_str(), ios::in);
+    std::cout << file.is_open() << endl;
+    std::string line;
+    if (file.is_open() && std::getline(file, line)){
+        int n = stoi(line);
+        return n;
+    }
+    return -1;
+}
+
+Util::Vertex* Util::readGraph(std::string fileName){
+    Util::Vertex* VertexArray = NULL;
+    std::ifstream file(fileName.c_str(), ios::in);
+    std::cout << file.is_open() << endl;
+    int n;
+    if (file.is_open()){
+        std::string line;
+        if (std::getline(file, line)){
+            n = stoi(line) + 1;
+            VertexArray = new Vertex [n];
+        }else {return NULL;}
+        while(std::getline(file, line)){
+            int k = stoi(std::strtok(&line[0], ":,"));
+            for(char* c = std::strtok(NULL, ":,"); c != NULL; c = std::strtok(NULL, ":,")){
+                int a = stoi(c);
+                VertexArray[k].adj.push_back(a);
+                VertexArray[a].adj.push_back(k);
+            }
+        }
+    }
+    file.close();
+    for(int i = 1; i < n; ++i){
+        VertexArray[i].node = i;
+        VertexArray[i].degree = VertexArray[i].adj.size();
+    }
+
+    return VertexArray;
+}
+
+bool Util::compareVertexByDegree(Util::Vertex a, Util::Vertex b){
+   return a.degree > b.degree;
+}
+
+void Util::printVertexArray(Util::Vertex* v, int n){
+    for(int i = 1; i < n; ++i){
+        std::cout << "Node " << v[i].node << " degree " << v[i].degree << "  ->  ";
+        for(int r : v[i].adj){
+           std::cout << v[r].node << " ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << endl << endl;
+}
+
+static int ss = 0;
+bool Util::subsets(Util::Vertex* vertexArray, int n, int k, int start, int currentLength, bool* used){
+
+    if(currentLength == k){
+        std::vector<Util::Vertex> subset;
+        for(int i = 0; i < n; ++i){
+            if(used[i]){
+                Util::Vertex no = *(vertexArray + i);
+                subset.push_back(no);
+            }
+        }
+        if(subset.size() > 2 && Util::completeSubgraph(subset)){ // <= 2 é o casso trivial
+            ss++;
+                std::cout << k << "-Clique encontrado:   ";
+                for(Util::Vertex v : subset)
+                    std::cout << v.node << ", ";
+                std::cout << std::endl;
+                return true;
+        }
+        return false;
+    }
+
+    if(start == n){
+        return false;
+    }
+
+    used[start] = true;
+    Util::subsets(vertexArray, n, k, start + 1, currentLength + 1, used);
+
+    used[start] = false;
+    Util::subsets(vertexArray, n, k, start + 1, currentLength, used);
+    return false;
+}
+
+bool Util::completeSubgraph(std::vector<Util::Vertex> subgraph){ // recebe um conjunto de vértices subgraph e reorna true se subgraph é completo
+    for(Util::Vertex v : subgraph){
+        for(Util::Vertex u : subgraph){
+            auto result = std::find(std::begin(v.adj), std::end(v.adj), u.node);
+            if(result == std::end(v.adj) && v.node != u.node){
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+void Util::tentativaExato(Util::Vertex* vertexArray, int n){
+
+    std::sort(vertexArray, vertexArray+n, Util::compareVertexByDegree); // ordena em ordem não crescente
+    int l = 0, d = ((Util::Vertex)* vertexArray).degree; // começa com tamanho 1 e o grau do primeiro vertice
+    while( vertexArray+l != vertexArray+n ){
+        while(((Util::Vertex)* (vertexArray + l + 1)).degree == d) ++l; // incluí os vértices de grau d, isso aqui é bom?? como binomial(n,k) varia??
+        if(l + 1 >= d){
+            bool u[l + 1];
+            ss = 0; // n subsets gerados, deve ser igual a binomial(l+1,d), remover depois
+           if(Util::subsets(vertexArray, l + 1, d, 0,0, u)); // colocar um break depois, assim o algoritmo para no primeiro clique
+           std::cout << "l: " << l + 1 << " d: " << d << " subsets: " << ss << std::endl; //remover depois
+        }
+        ++l;
+        d = ((Util::Vertex)* (vertexArray + l)).degree; // tenta o próximo grau
+    }
+
+    std::cout << "fim" << std::endl;
 }
