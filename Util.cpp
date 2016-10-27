@@ -11,6 +11,8 @@
 #include<string>
 #include <vector>
 #include "Util.h"
+#include <cstring>
+#include <algorithm>
 using namespace std;
 
 // **************************** FUNÇÕES GERAIS ************************************************
@@ -333,9 +335,10 @@ void Util::printVertexArray(Util::Vertex* v, int n){
 }
 
 static int ss = 0;
-bool Util::subsets(Util::Vertex* vertexArray, int n, int k, int start, int currentLength, bool* used){
+std::vector<Util::Vertex>* Util::subsets(Util::Vertex* vertexArray, int n, int k, int start, int currentLength, bool* used){
 
     if(currentLength == k){
+
         std::vector<Util::Vertex> subset;
         for(int i = 0; i < n; ++i){
             if(used[i]){
@@ -349,13 +352,18 @@ bool Util::subsets(Util::Vertex* vertexArray, int n, int k, int start, int curre
                 for(Util::Vertex v : subset)
                     std::cout << v.node << ", ";
                 std::cout << std::endl;
-                return true;
+            std::vector<Util::Vertex>* result = new std::vector<Util::Vertex>;
+            std::vector<Util::Vertex> rr = *result;
+            rr = subset;
+//            result->assign(std::begin(subset), std::end(subset));
+//            std::copy(std::begin(subset), std::end(subset), rr.begin());
+            return &rr;
         }
-        return false;
+        return NULL;
     }
 
     if(start == n){
-        return false;
+        return NULL;
     }
 
     used[start] = true;
@@ -363,7 +371,7 @@ bool Util::subsets(Util::Vertex* vertexArray, int n, int k, int start, int curre
 
     used[start] = false;
     Util::subsets(vertexArray, n, k, start + 1, currentLength, used);
-    return false;
+    return NULL;
 }
 
 bool Util::completeSubgraph(std::vector<Util::Vertex> subgraph){ // recebe um conjunto de vértices subgraph e reorna true se subgraph é completo
@@ -378,7 +386,7 @@ bool Util::completeSubgraph(std::vector<Util::Vertex> subgraph){ // recebe um co
     return true;
 }
 
-void Util::tentativaExato(Util::Vertex* vertexArray, int n){
+std::vector<Util::Vertex>* Util::exato(Util::Vertex* vertexArray, int n){
 
     std::sort(vertexArray, vertexArray+n, Util::compareVertexByDegree); // ordena em ordem não crescente
     int l = 0, d = ((Util::Vertex)* vertexArray).degree; // começa com tamanho 1 e o grau do primeiro vertice
@@ -387,8 +395,12 @@ void Util::tentativaExato(Util::Vertex* vertexArray, int n){
         if(l + 1 >= d){
             bool u[l + 1];
             ss = 0; // n subsets gerados, deve ser igual a binomial(l+1,d), remover depois
-           if(Util::subsets(vertexArray, l + 1, d, 0,0, u)); // colocar um break depois, assim o algoritmo para no primeiro clique
-           std::cout << "l: " << l + 1 << " d: " << d << " subsets: " << ss << std::endl; //remover depois
+            std::vector<Util::Vertex>* result = Util::subsets(vertexArray, l + 1, d, 0,0, u);
+            if(result != NULL){
+                std::cout << " uuu ";
+
+            }
+            std::cout << "l: " << l + 1 << " d: " << d << " subsets: " << ss << std::endl; //remover depois
         }
         ++l;
         d = ((Util::Vertex)* (vertexArray + l)).degree; // tenta o próximo grau

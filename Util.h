@@ -59,11 +59,11 @@ public :
 
     static void printVertexArray(Vertex *v, int n);
 
-    static bool subsets(Util::Vertex *vertexArray, int n, int k, int start, int currLen, bool* used);
+    static std::vector<Util::Vertex>* subsets(Util::Vertex *vertexArray, int n, int k, int start, int currLen, bool* used);
 
     static bool completeSubgraph(std::vector<Util::Vertex> subgraph);
 
-    static void tentativaExato(Vertex *vertexArray, int n);
+    static std::vector<Util::Vertex>* exato(Vertex *vertexArray, int n);
 
 };
 #endif //PROJETOTG_UTIL_H

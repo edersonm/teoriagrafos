@@ -16,6 +16,11 @@ int main(){
 
    Util::Vertex* vertexArray =  Util::readGraph(testFile);
    Util::printVertexArray(vertexArray, n);
-   Util::tentativaExato(vertexArray, n);
+   std::vector<Util::Vertex> result = *Util::exato(vertexArray, n);
+
+    std::cout << "result: " << std::endl;
+    for(auto u : result){
+        std::cout << u.node << ", ";
+    }
 }
 
