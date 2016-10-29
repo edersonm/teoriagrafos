@@ -334,10 +334,9 @@ void Util::printVertexArray(Util::Vertex* v, int n){
     std::cout << endl << endl;
 }
 
-static int ss = 0;
-std::vector<Util::Vertex>* Util::subsets(Util::Vertex* vertexArray, int n, int k, int start, int currentLength, bool* used){
+void Util::subsets(Util::Vertex* vertexArray, int n, int k, int start, int currentLength, bool* used, bool* found, std::vector<Util::Vertex>* result){
 
-    if(currentLength == k){
+    if(currentLength == k && !*found){
 
         std::vector<Util::Vertex> subset;
         for(int i = 0; i < n; ++i){
@@ -346,32 +345,30 @@ std::vector<Util::Vertex>* Util::subsets(Util::Vertex* vertexArray, int n, int k
                 subset.push_back(no);
             }
         }
+
         if(subset.size() > 2 && Util::completeSubgraph(subset)){ // <= 2 é o casso trivial
-            ss++;
-                std::cout << k << "-Clique encontrado:   ";
-                for(Util::Vertex v : subset)
-                    std::cout << v.node << ", ";
-                std::cout << std::endl;
-            std::vector<Util::Vertex>* result = new std::vector<Util::Vertex>;
-            std::vector<Util::Vertex> rr = *result;
-            rr = subset;
-//            result->assign(std::begin(subset), std::end(subset));
-//            std::copy(std::begin(subset), std::end(subset), rr.begin());
-            return &rr;
+            *found = true;
+            std::cout << k << "-Clique encontrado:   ";
+            for(Util::Vertex v : subset)
+                std::cout << v.node << ", ";
+            std::cout << std::endl;
+            for(Util::Vertex t : subset)
+                (*result).push_back(t);
+            return;
         }
-        return NULL;
+        return;
     }
 
     if(start == n){
-        return NULL;
+        return;
     }
 
     used[start] = true;
-    Util::subsets(vertexArray, n, k, start + 1, currentLength + 1, used);
+    Util::subsets(vertexArray, n, k, start + 1, currentLength + 1, used, found, result);
 
     used[start] = false;
-    Util::subsets(vertexArray, n, k, start + 1, currentLength, used);
-    return NULL;
+    Util::subsets(vertexArray, n, k, start + 1, currentLength, used, found, result);
+    return;
 }
 
 bool Util::completeSubgraph(std::vector<Util::Vertex> subgraph){ // recebe um conjunto de vértices subgraph e reorna true se subgraph é completo
@@ -386,25 +383,19 @@ bool Util::completeSubgraph(std::vector<Util::Vertex> subgraph){ // recebe um co
     return true;
 }
 
-std::vector<Util::Vertex>* Util::exato(Util::Vertex* vertexArray, int n){
+std::vector<Util::Vertex> Util::exato(Util::Vertex* vertexArray, int n){
 
     std::sort(vertexArray, vertexArray+n, Util::compareVertexByDegree); // ordena em ordem não crescente
     int l = 0, d = ((Util::Vertex)* vertexArray).degree; // começa com tamanho 1 e o grau do primeiro vertice
-    while( vertexArray+l != vertexArray+n ){
+    while( vertexArray+l <= vertexArray+n && d > 1){
         while(((Util::Vertex)* (vertexArray + l + 1)).degree == d) ++l; // incluí os vértices de grau d, isso aqui é bom?? como binomial(n,k) varia??
         if(l + 1 >= d){
             bool u[l + 1];
-            ss = 0; // n subsets gerados, deve ser igual a binomial(l+1,d), remover depois
-            std::vector<Util::Vertex>* result = Util::subsets(vertexArray, l + 1, d, 0,0, u);
-            if(result != NULL){
-                std::cout << " uuu ";
-
-            }
-            std::cout << "l: " << l + 1 << " d: " << d << " subsets: " << ss << std::endl; //remover depois
+            bool found = false;
+            std::vector<Util::Vertex> result;
+            Util::subsets(vertexArray, l + 1, d, 0,0, u, &found, &result);
+            if(found) return result;
         }
-        ++l;
-        d = ((Util::Vertex)* (vertexArray + l)).degree; // tenta o próximo grau
+        --d;
     }
-
-    std::cout << "fim" << std::endl;
 }

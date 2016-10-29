@@ -16,11 +16,12 @@ int main(){
 
    Util::Vertex* vertexArray =  Util::readGraph(testFile);
    Util::printVertexArray(vertexArray, n);
-   std::vector<Util::Vertex> result = *Util::exato(vertexArray, n);
+   std::vector<Util::Vertex> result = Util::exato(vertexArray, n);
 
-    std::cout << "result: " << std::endl;
-    for(auto u : result){
-        std::cout << u.node << ", ";
-    }
+   std::cout << "\nclique encontrado: \n";
+   for(Util::Vertex u : result)
+      std::cout << u.node << ", ";
+    std::cout << "" << std::endl;
+//   Util::exato(vertexArray, n);
 }
 
