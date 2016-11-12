@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include "Util.h"
+#include "ExactAlgorithm.h"
 #include <algorithm>
 #include <vector>
 
@@ -16,7 +17,7 @@ int main(){
 
    Util::Vertex* vertexArray =  Util::readGraph(testFile);
    Util::printVertexArray(vertexArray, n);
-   std::vector<Util::Vertex> result = Util::exato(vertexArray, n);
+   std::vector<Util::Vertex> result = Util::exato(vertexArray, n); //Executando algoritmo exato.
 
    std::cout << "\nclique encontrado: \n";
    for(Util::Vertex u : result)
