@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <array>
 #include "json.hpp"
+#include <chrono>
 
 using namespace std;
 using json = nlohmann::json;
@@ -85,10 +86,6 @@ bool Util::completeSubgraph(std::vector<Util::Vertex> subgraph){ // recebe um co
     return true;
 }
 
-<<<<<<< Updated upstream
-=======
-
-
 Util::Vertex* Util::readNXGraph(std::string fileName){
     Util::Vertex* VertexArray = NULL;
     std::ifstream file(fileName.c_str(), ios::in);
@@ -147,11 +144,11 @@ void Util::b_exato(int q, int w, std::string prefix, std::string posfix){
         std::array<double,3> info = Util::readGraphInfo(fileName);
         Util::Vertex* vertexArray =  Util::readNXGraph(fileName);
 
-        auto start = chrono::steady_clock::now();
+        auto start = std::chrono::steady_clock::now();
 
         auto result = Exato::exato(vertexArray, info[0]);
 
-        auto end = chrono::steady_clock::now();
+        auto end = std::chrono::steady_clock::now();
         auto diff = end - start;
 
         json benchmarkResults = {
@@ -174,4 +171,3 @@ void Util::b_exato(int q, int w, std::string prefix, std::string posfix){
 
     }
 }
->>>>>>> Stashed changes

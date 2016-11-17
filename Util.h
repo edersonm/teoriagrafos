@@ -4,6 +4,7 @@
 #include<string>
 #include<list>
 #include<vector>
+#include<array>
 
 #ifndef PROJETOTG_UTIL_H
 #define PROJETOTG_UTIL_H

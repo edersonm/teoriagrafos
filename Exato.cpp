@@ -2,6 +2,7 @@
 #include <iostream>
 #include "Exato.h"
 #include "Util.h"
+#include <algorithm>
 
 using namespace std;
 #define minDegree(v,n) ((Util::Vertex) *(v+n-1)).degree
