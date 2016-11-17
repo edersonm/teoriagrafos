@@ -11,7 +11,7 @@
 class ExactAlgorithm {
 
 public:
-    static std::vector<Util::Vertex> exato(Util::Vertex *vertexArray, int n);
+    std::vector<Util::Vertex> exato(Util::Vertex *vertexArray, int n);
 };
 
 

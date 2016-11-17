@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "Util.h"
 #include "ExactAlgorithm.h"
+#include "GA.h"
 #include <algorithm>
 #include <vector>
 
@@ -24,5 +25,11 @@ int main(){
       std::cout << u.node << ", ";
     std::cout << "" << std::endl;
 //   Util::exato(vertexArray, n);
+   //Genetic
+   GA ga(n,vertexArray);
+   int resultado = ga.run();
+   if(resultado != 0){
+      std::cout<< "Clique máximo encontrado: " << resultado << "\n\n";
+   }
 }
 

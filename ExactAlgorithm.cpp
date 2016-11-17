@@ -4,6 +4,7 @@
 
 #include "ExactAlgorithm.h"
 #include "Util.h"
+#include <algorithm>
 
 std::vector<Util::Vertex> Util::exato(Util::Vertex* vertexArray, int n){
 
