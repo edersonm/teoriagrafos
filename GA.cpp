@@ -197,7 +197,8 @@ void GA::PrintChromo(std::vector<bool> bits) {
 }
 
 int GA::run() {
-    float retorno = 0.0f;
+    int retorno = 0;
+    float sol = 0.0f;
     srand((int)time(NULL));
     int genmin=0;
     int i = 0;
@@ -219,6 +220,10 @@ int GA::run() {
                 sfound = true;
                 std::cout << "Solução encontrada em:" << genmin << " gerações " << "\n\n";
                 PrintChromo(pop[i].bits);
+                if(pop[i].fitness > sol){
+                    sol = pop[i].fitness;
+                    retorno = bitSize(pop[i].bits);
+                }
                 if(pop[i].fitness == 2){
                     return glength-1;
                 }
