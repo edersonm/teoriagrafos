@@ -8,6 +8,7 @@
 #include <time.h>
 #include <vector>
 #include "GA.h"
+#include "Util.h"
 #include <math.h>
 #include <algorithm>
 using namespace std;
@@ -113,16 +114,23 @@ float GA::assignFitness(std::vector<bool> bits) {
         }
     }
     if(temp ==0){
-        return -2.0f;
+        return 0.0f;
     } else{
-        return (float)-(1.0f/((float)(clength-1.0f)-(float)temp));
+        return (float)(1.0f/((float)(clength)-2.0f))*((temp-1)/clength-1)*0.99;
     }
 
 }
+
 bool GA::isClique(std::vector<bool> bits) {
+
+    return Util::GACompleteSubgraph(bits,graph);
+
+
+
+
     bool retorno = true;
     std::vector <int> test;
-    if(bitSize(bits) == 0){
+    if(bitSize(bits) <= 1){
         return false;
     }
     for(int i =0;i<bits.size();i++){
@@ -239,18 +247,18 @@ int GA::run() {
     }
     //flag for solution
     bool sfound = false;
-    while(!sfound || nochange<tenpercent){
+    while(!sfound || nochange<=tenpercent){
        // cout<<"geração:"<< genmin <<"\n";
         float tfit = 0.0f; //para roleta
         //Verify each chromossome in the population and assign a fitness
         for (i=0; i<psize; i++) {
             pop[i].fitness = assignFitness(pop[i].bits);
             tfit += pop[i].fitness;
-            if(pop[i].fitness > 0){
+            if(pop[i].fitness >= (1.0f/((float)(clength)-2.0f))){
                 sfound = true;
                 if(pop[i].fitness == 2){
                     cout << "Melhor solução encontrada:" <<pop[i].fitness<<" em " << genmin << " gerações " << "\n";
-                    return clength-1;
+                    return clength;
                 }
                 if(pop[i].fitness > sol){
                     cout << "Solução encontrada:" <<pop[i].fitness<<" em " << genmin << " gerações " << "\n";

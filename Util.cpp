@@ -148,6 +148,8 @@ void Util::b_exato(int q, int w, std::string prefix, std::string posfix){
 
         auto result = Exato::exato(vertexArray, info[0]);
 
+
+
         auto end = std::chrono::steady_clock::now();
         auto diff = end - start;
 
@@ -170,4 +172,15 @@ void Util::b_exato(int q, int w, std::string prefix, std::string posfix){
         }
 
     }
+}
+
+bool Util::GACompleteSubgraph(std::vector<bool> bits, Util::Vertex* v){
+
+    std::vector<Util::Vertex> sub;
+
+    for(int i = 0; i < bits.size(); ++i){
+        if(bits[i]) sub.push_back((Util::Vertex) *(v + i));
+    }
+
+    return Util::completeSubgraph(sub);
 }

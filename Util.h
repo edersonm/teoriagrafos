@@ -49,5 +49,6 @@ public :
 
 
     static void b_exato(int q, int w, std::string prefix, std::string posfix);
+    static bool GACompleteSubgraph(std::vector<bool> bits, Vertex* v);
 };
 #endif //PROJETOTG_UTIL_H
