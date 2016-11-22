@@ -28,6 +28,7 @@ int main(){
     std::cout <<"teste tamanho:" <<n<<"\n\n";
    GA ga(n,vertexArray);
    int resultado = ga.run();
+
    if(resultado != 0){
       std::cout<< "Clique máximo encontrado: " << resultado << "\n\n";
    }

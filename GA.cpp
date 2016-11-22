@@ -105,6 +105,8 @@ float GA::assignFitness(std::vector<bool> bits) {
     bool found = false;
     std::vector<Util::Vertex> teste;
     int temp = bitSize(bits);
+    int grau = grauAv(bits);
+    //cout<<"grau:"<<grau<<"\n";
     //cout<< "tamanho:"<<clength-1 << "elementos"<< temp;
     if(isClique(bits)){
         if(temp == clength){
@@ -116,7 +118,12 @@ float GA::assignFitness(std::vector<bool> bits) {
     if(temp ==0){
         return 0.0f;
     } else{
-        return (float)(1.0f/(((float)(clength)-2.0f))*0.90*grauAv(bits));
+        if(grau>1){
+            return (float)(1.0f/(((float)(clength)-2.0f))*0.90*(grauAv(bits)-1)/(clength-2));
+        }else{
+            return (float)(1.0f/(((float)(clength)-2.0f))*0.90*(grauAv(bits))/(clength-2));
+        }
+
     }
 
 }
@@ -166,16 +173,19 @@ bool GA::isClique(std::vector<bool> bits) {
 }
 
 void GA::mutate(std::vector<bool> bits) {
-    float random = ((float)rand()/(float)(RAND_MAX));
+    srand((int)time(NULL));
+
     for (int i=0; i<bits.size(); i++) {
+        float random = ((float)rand()/(float)(RAND_MAX));
         if (random < xmen) {
-            if (bits[i] == true){
+            if (bits[i]){
                 bits[i] = false;
             }else{
                 bits.at(i) = true;
             }
         }
     }
+
 }
 
 int GA::bitSize(std::vector<bool> bits){
@@ -191,9 +201,7 @@ int GA::bitSize(std::vector<bool> bits){
 
 
 void GA::crossover(std::vector<bool> offspring1, std::vector<bool> offspring2) {
-    //cout<<"Crossover";
-    //printChromo(offspring1);
-    //printChromo(offspring2);
+    srand((int)time(NULL));
     float random = ((float)rand()/(float)(RAND_MAX));
     if (random < xover) {
         //create a random crossover point
@@ -209,17 +217,15 @@ void GA::crossover(std::vector<bool> offspring1, std::vector<bool> offspring2) {
                 f2[i]=offspring1[i];
             }
         }
-        offspring1 = f1;
-        offspring2 = f2;
+        offspring1.swap(f1);
+        offspring2.swap(f2);
     }
-    //cout<<" saindo";
-    //printChromo(offspring1);
-    //printChromo(offspring2);
+
 }
 
 std::vector<bool> GA::roulette(float total_fitness, Chromo* Population) {
     float random = ((float)rand()/(RAND_MAX));
-    //cout<<"total fitness "<< total_fitness<<"\n";
+
     float total = (float)(random * total_fitness);
     //Matar os negativos, normalizar a partir dos negativos, ou dar sort e matar
     float fitness_temp = 0.0f;
@@ -230,7 +236,7 @@ std::vector<bool> GA::roulette(float total_fitness, Chromo* Population) {
             return Population[i].bits;
     }
 
-    return  std::vector<bool>  (1,false);;
+    return  std::vector<bool>  (clength,false);
 }
 
 void GA::printChromo(std::vector<bool> bits) {
@@ -243,6 +249,19 @@ void GA::printChromo(std::vector<bool> bits) {
     cout << "\n\n";
 
 }
+
+std::vector<bool> GA::elitism(Chromo* Population) {
+    float sol = 0.0f;
+    int temp = 0;
+    for (int p=0; p<psize; p++) {
+        if(Population[p].fitness>sol){
+            sol = Population[p].fitness;
+            temp = p;
+        }
+    }
+    return Population[temp].bits;
+}
+
 
 int GA::run() {
     cout << "Iniciando algoritmo genético com:população:" <<psize << ", iterações:"<< maxgen << ", cromossomo de tamanho:"<< clength<<"\n\n";
@@ -288,20 +307,39 @@ int GA::run() {
                 }
             }
         }
-        cout<<"geração:"<< genmin << "FitnessTotal: "<< tfit <<"\n";
+        //cout<<"geração:"<< genmin << " FitnessTotal: "<< tfit <<"\n";
         //Create new pop
         Chromo temp[psize];
         int cPop = 0;
+        //Elitism
+
+        std::vector<bool> elit =elitism(pop) ;
+        //temp[cPop++] = Chromo(elit, 0.0f);
 
         while (cPop < psize) {
             //Select parents
             std::vector<bool> offspring1 = roulette(tfit, pop);
             std::vector<bool> offspring2 = roulette(tfit, pop);
-
+            //printChromo(offspring1);
             //add crossover
             crossover(offspring1, offspring2);
+
+            //Force variability if too similar
+            int con = 0;
+            float temx = xmen;
+            for(int i = 0;i<offspring1.size();i++){
+                if(offspring1[i] == offspring2[i] ){
+                    con++;
+                }
+            }
+
+            if(con == clength){
+                xmen = 0.5f;
+            }
+
             //now mutate
             mutate(offspring1);
+            //printChromo(offspring1);
             mutate(offspring2);
 
             //add offspring to new population
