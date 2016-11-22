@@ -14,9 +14,9 @@ int main(){
 
 //    Util::b_exato(p, q, prefix, posfix);     //benchmark do exato do arquivo p até o q e salva os arquivos json
 //    Util::b_ga(p, q, prefix, posfix);        //o mesmo só que para o genético
-    Util::b_debug(p, q, prefix, posfix);     // roda do arquivo p até o q em ambos e printa o clique encontrado e outras info
+//    Util::b_debug(p, q, prefix, posfix);     // roda do arquivo p até o q em ambos e printa o clique encontrado e outras info
 
-//    Util::b_compare(p, q, prefix, posfix);    //benchmark de ambos, usar isso pro artigo;
+    Util::b_compare(p, q, prefix, posfix);    //benchmark de ambos, usar isso pro artigo;
 
 
 

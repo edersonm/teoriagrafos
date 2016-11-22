@@ -243,6 +243,7 @@ void Util::b_debug(int q, int w, std::string prefix, std::string posfix){
 
 void Util::b_compare(int q, int w, std::string prefix, std::string posfix) {
     for(int p = q; p <= w; p++){
+        std::cout << "benchmark arquivo n: " << p << std::endl;
         Util::b_exato(p, p, prefix, posfix);
         Util::b_ga(p, p, prefix, posfix);
     }

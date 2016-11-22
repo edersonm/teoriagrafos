@@ -1,1 +1,1 @@
-{"algorithm":"ga","clique_size":4,"density":1,"n_edges":45,"n_nodes":10,"run_time":402673204}
+{"algorithm":"ga","clique_size":8,"density":0.97778,"n_edges":44,"n_nodes":10,"run_time":1428786580}
