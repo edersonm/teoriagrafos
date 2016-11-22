@@ -267,10 +267,6 @@ int GA::run() {
         //Verify each chromossome in the population and assign a fitness
         for (i=0; i<psize; i++) {
             pop[i].fitness = assignFitness(pop[i].bits);
-            if(pop[i].fitness<0){
-                cout<<"Fitness de cromossomo" << pop[i].fitness<<" Numero de uns:"<<bitSize(pop[i].bits) <<"\n" ;
-            }
-
             tfit += pop[i].fitness;
             if(pop[i].fitness >= (1.0f/((float)(clength)-2.0f))){
                 sfound = true;
@@ -326,7 +322,6 @@ int GA::run() {
             return retorno;
         }
         if(tempsol<sol){
-            cout<<"Temp Sol:" << tempsol<<" sol:" <<sol <<"\n\n";
             tempsol = sol;
 
         }else{
