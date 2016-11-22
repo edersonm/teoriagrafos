@@ -36,6 +36,7 @@ public:
     void    crossover(std::vector<bool> offspring1, std::vector<bool> offspring2);
     void printChromo(std::vector<bool> bits);
     bool isClique(std::vector<bool> bits);
+    float grauAv(std::vector<bool> bits);
     int bitSize(std::vector<bool> bits);
     int run();
 

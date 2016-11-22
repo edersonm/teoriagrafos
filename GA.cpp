@@ -116,9 +116,23 @@ float GA::assignFitness(std::vector<bool> bits) {
     if(temp ==0){
         return 0.0f;
     } else{
-        return (float)(1.0f/((float)(clength)-2.0f))*((temp-1)/clength-1)*0.99;
+        return (float)(1.0f/(((float)(clength)-2.0f))*0.90*grauAv(bits));
     }
 
+}
+
+float GA::grauAv(std::vector<bool> bits){
+    float retorno = 0.0f;
+    int cont = 0;
+    for(int i=0;i<bits.size();i++){
+        if(bits[i]){
+            retorno+= (float)graph[i].degree;
+            cont++;
+        }
+    }
+    retorno = retorno/(float)cont;
+
+    return retorno;
 }
 
 bool GA::isClique(std::vector<bool> bits) {
@@ -248,11 +262,15 @@ int GA::run() {
     //flag for solution
     bool sfound = false;
     while(!sfound || nochange<=tenpercent){
-       // cout<<"geração:"<< genmin <<"\n";
+
         float tfit = 0.0f; //para roleta
         //Verify each chromossome in the population and assign a fitness
         for (i=0; i<psize; i++) {
             pop[i].fitness = assignFitness(pop[i].bits);
+            if(pop[i].fitness<0){
+                cout<<"Fitness de cromossomo" << pop[i].fitness<<" Numero de uns:"<<bitSize(pop[i].bits) <<"\n" ;
+            }
+
             tfit += pop[i].fitness;
             if(pop[i].fitness >= (1.0f/((float)(clength)-2.0f))){
                 sfound = true;
@@ -274,7 +292,7 @@ int GA::run() {
                 }
             }
         }
-
+        cout<<"geração:"<< genmin << "FitnessTotal: "<< tfit <<"\n";
         //Create new pop
         Chromo temp[psize];
         int cPop = 0;
