@@ -149,26 +149,26 @@ bool GA::isClique(std::vector<bool> bits) {
 
 
 
-    bool retorno = true;
-    std::vector <int> test;
-    if(bitSize(bits) <= 1){
-        return false;
-    }
-    for(int i =0;i<bits.size();i++){
-        if(bits[i]){
-            test.push_back(i);
-        }
-    }
-    while(test.size() > 1){
-        int t = test.back();
-        test.pop_back();
-        for(int i :test){
-            if(find(std::begin(graph[i].adj),std::end(graph[i].adj),t) == graph[i].adj.end()){
-                return false;
-            }
-        }
-    }
-    return retorno;
+//    bool retorno = true;
+//    std::vector <int> test;
+//    if(bitSize(bits) <= 1){
+//        return false;
+//    }
+//    for(int i =0;i<bits.size();i++){
+//        if(bits[i]){
+//            test.push_back(i);
+//        }
+//    }
+//    while(test.size() > 1){
+//        int t = test.back();
+//        test.pop_back();
+//        for(int i :test){
+//            if(find(std::begin(graph[i].adj),std::end(graph[i].adj),t) == graph[i].adj.end()){
+//                return false;
+//            }
+//        }
+//    }
+//    return retorno;
 
 }
 
@@ -264,7 +264,7 @@ std::vector<bool> GA::elitism(Chromo* Population) {
 
 
 int GA::run() {
-    cout << "Iniciando algoritmo genético com:população:" <<psize << ", iterações:"<< maxgen << ", cromossomo de tamanho:"<< clength<<"\n\n";
+//    cout << "Iniciando algoritmo genético com:população:" <<psize << ", iterações:"<< maxgen << ", cromossomo de tamanho:"<< clength<<"\n\n";
     int retorno = 0;
     float sol = 0.0f;
     float tempsol = sol;
@@ -273,7 +273,7 @@ int GA::run() {
     int nochange = 0;
     int tenpercent = ((int)maxgen/10);
     int i = 0;
-    Chromo pop[psize];
+    Chromo *pop = new Chromo[psize];
     //Create random population
     for (int i=0; i<psize; i++) {
         pop[i] = getRandomChromo(clength);
@@ -290,18 +290,18 @@ int GA::run() {
             if(pop[i].fitness >= (1.0f/((float)(clength)-2.0f))){
                 sfound = true;
                 if(pop[i].fitness == 2){
-                    cout << "Melhor solução encontrada:" <<pop[i].fitness<<" em " << genmin << " gerações " << "\n";
+//                    cout << "Melhor solução encontrada:" <<pop[i].fitness<<" em " << genmin << " gerações " << "\n";
                     return clength;
                 }
                 if(pop[i].fitness > sol){
-                    cout << "Solução encontrada:" <<pop[i].fitness<<" em " << genmin << " gerações " << "\n";
-                    printChromo(pop[i].bits);
+//                    cout << "Solução encontrada:" <<pop[i].fitness<<" em " << genmin << " gerações " << "\n";
+//                    printChromo(pop[i].bits);
                     sol = pop[i].fitness;
                     retorno = bitSize(pop[i].bits);
                 }else{
                     if(nochange>= tenpercent){
-                        cout << "Melhor solução encontrada sem mudanças depois de 10%:" <<pop[i].fitness<<" em " << genmin << " gerações " << "\n";
-                        printChromo(pop[i].bits);
+//                        cout << "Melhor solução encontrada sem mudanças depois de 10%:" <<pop[i].fitness<<" em " << genmin << " gerações " << "\n";
+//                        printChromo(pop[i].bits);
                         return bitSize(pop[i].bits);
                     }
                 }
@@ -309,7 +309,7 @@ int GA::run() {
         }
         //cout<<"geração:"<< genmin << " FitnessTotal: "<< tfit <<"\n";
         //Create new pop
-        Chromo temp[psize];
+        Chromo *temp = new Chromo[psize];
         int cPop = 0;
         //Elitism
 
@@ -354,7 +354,7 @@ int GA::run() {
         }
         genmin++;
         if(genmin>maxgen){
-            cout << "Sem solução encontrada no número máximo de gerações: " << maxgen <<"!\n\n";
+//            cout << "Sem solução encontrada no número máximo de gerações: " << maxgen <<"!\n\n";
             sfound = true;
             nochange = tenpercent+1;
             return retorno;
@@ -366,7 +366,7 @@ int GA::run() {
             if(sfound){
                 nochange++;
                 if(nochange>=tenpercent){
-                    cout<<retorno;
+//                    cout<<retorno;
                 }
             }
         }

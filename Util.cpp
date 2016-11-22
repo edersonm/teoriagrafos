@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <array>
 #include "json.hpp"
+#include "GA.h"
 #include <chrono>
 
 using namespace std;
@@ -86,6 +87,17 @@ bool Util::completeSubgraph(std::vector<Util::Vertex> subgraph){ // recebe um co
     return true;
 }
 
+bool Util::GACompleteSubgraph(std::vector<bool> bits, Util::Vertex* v){
+
+    std::vector<Util::Vertex> sub;
+
+    for(int i = 0; i < bits.size(); ++i){
+        if(bits[i]) sub.push_back((Util::Vertex) *(v + i));
+    }
+
+    return Util::completeSubgraph(sub);
+}
+
 Util::Vertex* Util::readNXGraph(std::string fileName){
     Util::Vertex* VertexArray = NULL;
     std::ifstream file(fileName.c_str(), ios::in);
@@ -139,7 +151,7 @@ std::array<double, 3> Util::readGraphInfo(std::string fileName) {
 
 
 void Util::b_exato(int q, int w, std::string prefix, std::string posfix){
-    for(int i = q; i < w; i++){
+    for(int i = q; i <= w; i++){
         std::string fileName = prefix + to_string(i) + posfix;
         std::array<double,3> info = Util::readGraphInfo(fileName);
         Util::Vertex* vertexArray =  Util::readNXGraph(fileName);
@@ -174,13 +186,64 @@ void Util::b_exato(int q, int w, std::string prefix, std::string posfix){
     }
 }
 
-bool Util::GACompleteSubgraph(std::vector<bool> bits, Util::Vertex* v){
+void Util::b_ga(int q, int w, std::string prefix, std::string posfix){
+    for(int i = q; i <= w; i++){
+        std::string fileName = prefix + to_string(i) + posfix;
+        std::array<double,3> info = Util::readGraphInfo(fileName);
+        Util::Vertex* vertexArray =  Util::readNXGraph(fileName);
 
-    std::vector<Util::Vertex> sub;
+        auto start = std::chrono::steady_clock::now();
 
-    for(int i = 0; i < bits.size(); ++i){
-        if(bits[i]) sub.push_back((Util::Vertex) *(v + i));
+        GA ga(info[0], vertexArray);
+        int result = ga.run();
+
+
+        auto end = std::chrono::steady_clock::now();
+        auto diff = end - start;
+
+        json benchmarkResults = {
+                {"algorithm", "ga"},
+                {"n_nodes", info[0]},
+                {"n_edges", info[1]},
+                {"density", info[2]},
+                {"clique_size", result},
+                {"run_time", diff.count()}
+        };
+
+        ofstream jsonFile;
+        jsonFile.open("benchmark_jsons/benchmark_ga_" + to_string(i) + ".json");
+        if(jsonFile.is_open()){
+            jsonFile << benchmarkResults;
+            jsonFile.close();
+        }else{
+            std::cout << "ops nao foi possível abrir o json\n";
+        }
+
     }
+}
 
-    return Util::completeSubgraph(sub);
+void Util::b_debug(int q, int w, std::string prefix, std::string posfix){
+    for(int i = q; i <= w; i++){
+        std::string fileName = prefix + to_string(i) + posfix;
+        std::array<double,3> info = Util::readGraphInfo(fileName);
+        Util::Vertex* vertexArray =  Util::readNXGraph(fileName);
+
+
+        GA ga(info[0], vertexArray);
+        int GAresult = ga.run();
+        auto EXresult = Exato::exato(vertexArray, info[0]);
+
+        std::cout << "\n\n---   Compare   ---  " << fileName << " n_nodes: " << info[0] << " n_edges: " << info[1] << " density: " << info[2];
+        std::cout << "\nexato: " << EXresult.size() << "   GA: " << GAresult << "\n";
+
+    }
+}
+
+
+
+void Util::b_compare(int q, int w, std::string prefix, std::string posfix) {
+    for(int p = q; p <= w; p++){
+        Util::b_exato(p, p, prefix, posfix);
+        Util::b_ga(p, p, prefix, posfix);
+    }
 }

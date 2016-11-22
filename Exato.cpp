@@ -7,7 +7,7 @@
 using namespace std;
 #define minDegree(v,n) ((Util::Vertex) *(v+n-1)).degree
 #define maxDegree(v) ((Util::Vertex) *v).degree
-#define defineWorkingSet(v,l,d) while(((Util::Vertex)* (v + l + 1)).degree == d) ++l
+#define defineWorkingSet(v,l,d) while(l + 1 < n && ((Util::Vertex)* (v + l + 1)).degree == d) ++l
 
 std::vector<Util::Vertex> Exato::exato(Util::Vertex* vertexArray, int n){
     std::sort(vertexArray, vertexArray+n, Util::compareVertexByDegree); // ordena em ordem não crescente
@@ -46,10 +46,6 @@ void Exato::subsets(Util::Vertex* vertexArray, int n, int k, int start, int curr
         }
         if(subset.size() > 1 && Util::completeSubgraph(subset)){ // <= 2 é o casso trivial
             *found = true;
-            std::cout << k << "-Clique encontrado:   ";
-            for(Util::Vertex v : subset)
-                std::cout << v.node << ", ";
-            std::cout << std::endl;
             for(Util::Vertex t : subset)
                 (*result).push_back(t);
             return;
