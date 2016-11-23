@@ -33,8 +33,8 @@ public:
     float   assignFitness(std::vector<bool> bits);
     std::vector<bool>  roulette(float total_fitness, Chromo* Population);
     std::vector<bool>  elitism(Chromo* Population);
-    void    mutate(std::vector<bool> bits);
-    void    crossover(std::vector<bool> offspring1, std::vector<bool> offspring2);
+    void    mutate(std::vector<bool>& bits);
+    void    crossover(std::vector<bool>& offspring1, std::vector<bool>& offspring2);
     void printChromo(std::vector<bool> bits);
     bool isClique(std::vector<bool> bits);
     float grauAv(std::vector<bool> bits);
