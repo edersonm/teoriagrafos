@@ -9,7 +9,7 @@
 
 int main(){
 
-    int p = 1, q = 20;
+    int p = 28, q = 93;
     std::string prefix = "graphs/graph_", posfix  = ".in";
 
 //    Util::b_exato(p, q, prefix, posfix);     //benchmark do exato do arquivo p até o q e salva os arquivos json
