@@ -22,11 +22,18 @@ GA::GA(int clength, Util::Vertex* array) {
     this->glength = 1;
     this->graph = array;
     this->maxgen = maxgen;
-    this->xmen = 0.015;
+    this->xmen = 0.05;
     this->xover = 0.8;
     this->psize = 50;
     this->clength = clength;
-    this->maxgen = 100*clength;
+	if(clength<25){
+		this->maxgen = 50*clength;	
+	}else if(clength<50){
+		this->maxgen = 40*clength;
+	}else{
+		this->maxgen = 2000;
+	}
+    
 }
 
 int GA::getClength() {
@@ -69,6 +76,7 @@ void GA::setXover(float value) {
 
 
 GA::Chromo GA::getRandomChromo(int length) {
+    srand((int)time(NULL));
     Chromo retorno;
 
     std::vector<bool> bits(length,false);
@@ -79,15 +87,6 @@ GA::Chromo GA::getRandomChromo(int length) {
             bits[i] = true;
         else
             bits[i] = false;
-    }
-    bool teste= true;
-    for(int i =0;i<length;i++){
-        if(bits[i]){
-            teste = false;
-        }
-    }
-    if(teste){
-        printChromo(bits);
     }
     retorno.bits = bits;
     retorno.fitness = 0.0f;
@@ -172,19 +171,27 @@ bool GA::isClique(std::vector<bool> bits) {
 
 }
 
-void GA::mutate(std::vector<bool> bits) {
+void GA::mutate(std::vector<bool>& bits) {
     srand((int)time(NULL));
+	//Get a random member from chromossome and mutate based on the adj list:
+		float random = ((float)rand()/(float)(RAND_MAX));    	
+		if (random < xmen) {    
+			
+			int i = (int) clength*random;
+	    	//Get a random member from the adj list and mutate its position on the chromossome	
+			auto it = find (bits.begin()+i, bits.end(), true);		
+			int num = (int)(graph[it-bits.begin()].adj.size())*random;
+			if(it != bits.end()){
+				auto it2 = std::next(graph[it-bits.begin()].adj.begin(), num);
+				if (bits[*it2]){
+					bits[it-bits.begin()] = false;
+				}else{
 
-    for (int i=0; i<bits.size(); i++) {
-        float random = ((float)rand()/(float)(RAND_MAX));
-        if (random < xmen) {
-            if (bits[i]){
-                bits[i] = false;
-            }else{
-                bits.at(i) = true;
-            }
-        }
-    }
+					bits[*it2]=true;
+				}
+	
+			} 			
+    	}
 
 }
 
@@ -200,14 +207,15 @@ int GA::bitSize(std::vector<bool> bits){
 }
 
 
-void GA::crossover(std::vector<bool> offspring1, std::vector<bool> offspring2) {
+void GA::crossover(std::vector<bool>& offspring1, std::vector<bool>& offspring2) {
     srand((int)time(NULL));
+	
     float random = ((float)rand()/(float)(RAND_MAX));
     if (random < xover) {
         //create a random crossover point
         int crossover = (int) (random * clength);
-        std::vector<bool> f1 (maxgen,false);
-        std::vector<bool> f2 (maxgen,false);
+        std::vector<bool> f1 (clength,false);
+        std::vector<bool> f2 (clength,false);
         for(int i = 0;i<(clength);i++){
             if(i<crossover){
                 f1[i]=offspring1[i];
@@ -251,15 +259,15 @@ void GA::printChromo(std::vector<bool> bits) {
 }
 
 std::vector<bool> GA::elitism(Chromo* Population) {
-    float sol = 0.0f;
-    int temp = 0;
-    for (int p=0; p<psize; p++) {
-        if(Population[p].fitness>sol){
-            sol = Population[p].fitness;
-            temp = p;
+    float s = 0.0f;
+    int t = 0;
+    for (int p=0; p<getPsize(); p++) {
+        if(Population[p].fitness>s){
+            s = Population[p].fitness;
+            t = p;
         }
     }
-    return Population[temp].bits;
+    return Population[t].bits;
 }
 
 
@@ -268,9 +276,11 @@ int GA::run() {
     int retorno = 0;
     float sol = 0.0f;
     float tempsol = sol;
+    float tempfit = 0.0f;
     srand((int)time(NULL));
     int genmin=0;
     int nochange = 0;
+    int nochange2 = 0;
     int tenpercent = ((int)maxgen/10);
     int i = 0;
     Chromo *pop = new Chromo[psize];
@@ -295,7 +305,7 @@ int GA::run() {
                 }
                 if(pop[i].fitness > sol){
 //                    cout << "Solução encontrada:" <<pop[i].fitness<<" em " << genmin << " gerações " << "\n";
-//                    printChromo(pop[i].bits);
+//   mutate                 printChromo(pop[i].bits);
                     sol = pop[i].fitness;
                     retorno = bitSize(pop[i].bits);
                 }else{
@@ -307,15 +317,17 @@ int GA::run() {
                 }
             }
         }
-        //cout<<"geração:"<< genmin << " FitnessTotal: "<< tfit <<"\n";
+//        cout<<"geração:"<< genmin << " FitnessTotal: "<< tfit <<"\n";
         //Create new pop
         Chromo *temp = new Chromo[psize];
         int cPop = 0;
         //Elitism
 
-        std::vector<bool> elit =elitism(pop) ;
-        //temp[cPop++] = Chromo(elit, 0.0f);
+        std::vector<bool> elit =elitism(pop);
+		//cout<<"Melhor:"<< assignFitness(elit)<<"\n";
+		
 
+        temp[cPop] = Chromo(elit, 0.0f);
         while (cPop < psize) {
             //Select parents
             std::vector<bool> offspring1 = roulette(tfit, pop);
@@ -323,8 +335,9 @@ int GA::run() {
             //printChromo(offspring1);
             //add crossover
             crossover(offspring1, offspring2);
-
+            //printChromo(offspring1);
             //Force variability if too similar
+
             int con = 0;
             float temx = xmen;
             for(int i = 0;i<offspring1.size();i++){
@@ -334,7 +347,7 @@ int GA::run() {
             }
 
             if(con == clength){
-                xmen = 0.5f;
+                xmen = 0.2f;
             }
 
             //now mutate
@@ -344,7 +357,10 @@ int GA::run() {
 
             //add offspring to new population
             temp[cPop++] = Chromo(offspring1, 0.0f);
-            temp[cPop++] = Chromo(offspring2, 0.0f);
+            if(cPop<psize){
+                temp[cPop++] = Chromo(offspring2, 0.0f);
+            }
+
 
         }
         //copy temp population into main population array
@@ -365,8 +381,19 @@ int GA::run() {
         }else{
             if(sfound){
                 nochange++;
-                if(nochange>=tenpercent){
-//                    cout<<retorno;
+            }else{
+                if(tempfit ==0.0f){
+                    tempfit = tfit;
+                }else{
+                    if(tempfit == tfit ){
+                        if(nochange2++ == (2*tenpercent)){
+                            //kill half of the people
+                            for (int i=(psize/2); i<psize; i++) {
+                                pop[i] = getRandomChromo(clength);
+                            }
+                            nochange2=0;
+                        }
+                    }
                 }
             }
         }
