@@ -4,6 +4,7 @@
 #include<string>
 #include<list>
 #include<vector>
+#include<array>
 
 #ifndef PROJETOTG_UTIL_H
 #define PROJETOTG_UTIL_H
@@ -48,5 +49,12 @@ public :
 
 
     static void b_exato(int q, int w, std::string prefix, std::string posfix);
+    static bool GACompleteSubgraph(std::vector<bool> bits, Vertex* v);
+
+    static void b_ga(int q, int w, std::string prefix, std::string posfix);
+
+    static void b_compare(int q, int w, std::string prefix, std::string posfix);
+
+    static void b_debug(int q, int w, std::string prefix, std::string posfix);
 };
 #endif //PROJETOTG_UTIL_H

@@ -28,14 +28,16 @@ public:
     float getXmen();
     int getGlength();
     int getClength();
-    GA(int glength, Util::Vertex* array);
-    std::vector<bool> GetRandomBits(int length);
-    float   AssignFitness(std::vector<bool> bits);
-    std::vector<bool>  Roulette(int total_fitness, Chromo* Population);
-    void    Mutate(std::vector<bool> bits);
-    void    Crossover(std::vector<bool> offspring1, std::vector<bool> offspring2);
-    void PrintChromo(std::vector<bool> bits);
+    GA(int clength, Util::Vertex* array);
+    GA::Chromo getRandomChromo(int length);
+    float   assignFitness(std::vector<bool> bits);
+    std::vector<bool>  roulette(float total_fitness, Chromo* Population);
+    std::vector<bool>  elitism(Chromo* Population);
+    void    mutate(std::vector<bool>& bits);
+    void    crossover(std::vector<bool>& offspring1, std::vector<bool>& offspring2);
+    void printChromo(std::vector<bool> bits);
     bool isClique(std::vector<bool> bits);
+    float grauAv(std::vector<bool> bits);
     int bitSize(std::vector<bool> bits);
     int run();
 
