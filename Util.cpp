@@ -91,7 +91,7 @@ bool Util::GACompleteSubgraph(std::vector<bool> bits, Util::Vertex* v){
 
     std::vector<Util::Vertex> sub;
 
-    for(int i = 0; i < bits.size(); ++i){
+    for(int i = 0; i < bits.size(); i++){
         if(bits[i]) sub.push_back((Util::Vertex) *(v + i));
     }
 

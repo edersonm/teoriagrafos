@@ -21,19 +21,20 @@ using namespace std;
 GA::GA(int clength, Util::Vertex* array) {
     this->glength = 1;
     this->graph = array;
-    this->maxgen = maxgen;
     this->xmen = 0.05;
     this->xover = 0.8;
-    this->psize = 50;
+    if(clength<25){
+        this->psize = 50;
+        this->maxgen = 50*clength;
+    }else if(clength<50 ){
+        this->psize= 100;
+        this->maxgen = 40*clength;
+    }else{
+        this->maxgen = 2000;
+        this->psize= 200;
+    }
+
     this->clength = clength;
-	if(clength<25){
-		this->maxgen = 50*clength;	
-	}else if(clength<50){
-		this->maxgen = 40*clength;
-	}else{
-		this->maxgen = 2000;
-	}
-    
 }
 
 int GA::getClength() {
@@ -74,7 +75,6 @@ void GA::setXover(float value) {
 }
 //End Functions
 
-
 GA::Chromo GA::getRandomChromo(int length) {
     srand((int)time(NULL));
     Chromo retorno;
@@ -95,7 +95,6 @@ GA::Chromo GA::getRandomChromo(int length) {
 
 Util::Vertex convertSubGraph(std::vector<bool> bits){
     Util::Vertex retorno;
-
     return retorno;
 }
 
@@ -104,23 +103,20 @@ float GA::assignFitness(std::vector<bool> bits) {
     bool found = false;
     std::vector<Util::Vertex> teste;
     int temp = bitSize(bits);
-    int grau = grauAv(bits);
+    float grau = grauAv(bits);
     //cout<<"grau:"<<grau<<"\n";
     //cout<< "tamanho:"<<clength-1 << "elementos"<< temp;
-    if(isClique(bits)){
-        if(temp == clength){
-            return 2.0f;
-        }else{
-            return (1.0f/((float)(clength)-(float)temp));
-        }
-    }
-    if(temp ==0){
+    if(temp <2){
         return 0.0f;
     } else{
-        if(grau>1){
-            return (float)(1.0f/(((float)(clength)-2.0f))*0.90*(grauAv(bits)-1)/(clength-2));
+        if(isClique(bits)){
+            return (float)temp;
         }else{
-            return (float)(1.0f/(((float)(clength)-2.0f))*0.90*(grauAv(bits))/(clength-2));
+            if(grau>=1){
+                return (1.0f/grau);
+            }else{
+                return (1.0f*grau);
+            }
         }
 
     }
@@ -145,30 +141,6 @@ bool GA::isClique(std::vector<bool> bits) {
 
     return Util::GACompleteSubgraph(bits,graph);
 
-
-
-
-//    bool retorno = true;
-//    std::vector <int> test;
-//    if(bitSize(bits) <= 1){
-//        return false;
-//    }
-//    for(int i =0;i<bits.size();i++){
-//        if(bits[i]){
-//            test.push_back(i);
-//        }
-//    }
-//    while(test.size() > 1){
-//        int t = test.back();
-//        test.pop_back();
-//        for(int i :test){
-//            if(find(std::begin(graph[i].adj),std::end(graph[i].adj),t) == graph[i].adj.end()){
-//                return false;
-//            }
-//        }
-//    }
-//    return retorno;
-
 }
 
 void GA::mutate(std::vector<bool>& bits) {
@@ -186,13 +158,34 @@ void GA::mutate(std::vector<bool>& bits) {
 				if (bits[*it2]){
 					bits[it-bits.begin()] = false;
 				}else{
-
 					bits[*it2]=true;
 				}
-	
 			} 			
     	}
+}
 
+void GA::mutate2(std::vector<bool>& bits) {
+    srand((int)time(NULL));
+    //Get a random member from chromossome and mutate based on the adj list:
+    float random = ((float)rand()/(float)(RAND_MAX));
+    if (random < xmen) {
+        int i = (int) clength*random;
+        //Get a random member from the adj list and mutate its position on the chromossome
+        std::list <int>::iterator ite = graph[i].adj.begin();
+        std::list <int>::iterator comeco = graph[i].adj.begin();
+        for(int a =0;a<clength;a++){
+            if(ite != graph[i].adj.end()){
+                if(a==i || a == (*ite)){
+                    bits[a]=true;
+                }else{
+                    bits[a]=false;
+                }
+            } else{
+                bits[a]=false;
+            }
+            ++ite;
+        }
+    }
 }
 
 int GA::bitSize(std::vector<bool> bits){
@@ -203,7 +196,6 @@ int GA::bitSize(std::vector<bool> bits){
         }
     }
     return retorno;
-
 }
 
 
@@ -214,21 +206,47 @@ void GA::crossover(std::vector<bool>& offspring1, std::vector<bool>& offspring2)
     if (random < xover) {
         //create a random crossover point
         int crossover = (int) (random * clength);
-        std::vector<bool> f1 (clength,false);
-        std::vector<bool> f2 (clength,false);
-        for(int i = 0;i<(clength);i++){
-            if(i<crossover){
-                f1[i]=offspring1[i];
-                f2[i]=offspring2[i];
+        float random2 = ((float) rand() / (float) (RAND_MAX));
+        std::vector<bool>::iterator it ;
+        if (random2 < 0.5f) {
+            it = find(offspring1.begin() + crossover, offspring1.end(), true);
+        }else {
+            it = find(offspring2.begin() + crossover, offspring2.end(), true);
+        }
+        if (it != offspring1.end() && it != offspring2.end() ) {
+            if (random2 < 0.5f) {
+                std::list<int>::iterator el =graph[it - offspring1.begin()].adj.begin();
+                for (int i=0;i<clength;i++) {
+                    if(i== *el || i == it-offspring1.begin()){
+                        if(i!= *el && it!=offspring1.end()){
+                            it++;
+                        }
+                        offspring1[i] = true;
+                        offspring2[i] = true;
+
+                    }else{
+                        offspring1[i]=false;
+                        offspring2[i] = false;
+                    }
+                }
             }else{
-                f1[i]=offspring2[i];
-                f2[i]=offspring1[i];
+                std::list<int>::iterator el =graph[it - offspring2.begin()].adj.begin();
+                for (int i=0;i<clength;i++) {
+                    if(i== *el|| i == it-offspring2.begin()){
+                        if(i!= *el && it!=offspring1.end()){
+                            it++;
+                        }
+                        offspring1[i] = true;
+                        offspring2[i] = true;
+                    }else{
+                        offspring1[i]=false;
+                        offspring2[i] = false;
+                    }
+
+                }
             }
         }
-        offspring1.swap(f1);
-        offspring2.swap(f2);
     }
-
 }
 
 std::vector<bool> GA::roulette(float total_fitness, Chromo* Population) {
@@ -297,15 +315,15 @@ int GA::run() {
         for (i=0; i<psize; i++) {
             pop[i].fitness = assignFitness(pop[i].bits);
             tfit += pop[i].fitness;
-            if(pop[i].fitness >= (1.0f/((float)(clength)-2.0f))){
+            if(pop[i].fitness >= 2.0f){
                 sfound = true;
-                if(pop[i].fitness == 2){
+                if(pop[i].fitness == clength){
 //                    cout << "Melhor solução encontrada:" <<pop[i].fitness<<" em " << genmin << " gerações " << "\n";
                     return clength;
                 }
                 if(pop[i].fitness > sol){
 //                    cout << "Solução encontrada:" <<pop[i].fitness<<" em " << genmin << " gerações " << "\n";
-//   mutate                 printChromo(pop[i].bits);
+//                    printChromo(pop[i].bits);
                     sol = pop[i].fitness;
                     retorno = bitSize(pop[i].bits);
                 }else{
@@ -347,13 +365,13 @@ int GA::run() {
             }
 
             if(con == clength){
-                xmen = 0.2f;
+                xmen = 0.5f;
             }
 
             //now mutate
-            mutate(offspring1);
+            mutate2(offspring1);
             //printChromo(offspring1);
-            mutate(offspring2);
+            mutate2(offspring2);
 
             //add offspring to new population
             temp[cPop++] = Chromo(offspring1, 0.0f);
