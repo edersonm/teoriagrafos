@@ -157,8 +157,11 @@ void Util::b_exato(int q, int w, std::string prefix, std::string posfix){
         Util::Vertex* vertexArray =  Util::readNXGraph(fileName);
 
         auto start = std::chrono::steady_clock::now();
-
+        cout<<"---------------------------------"<< endl;
+        cout<<"LENDO GRAFO benchmark_exato_" << i << endl;
         auto result = Exato::exato(vertexArray, info[0]);
+        cout<<"---------------------------------"<< endl;
+        cout<<"FIM GRAFO benchmark_exato_" << i << endl;
 
 
 
@@ -175,13 +178,14 @@ void Util::b_exato(int q, int w, std::string prefix, std::string posfix){
         };
 
         ofstream jsonFile;
-        jsonFile.open("benchmark_jsons/benchmark_exato_" + to_string(i) + ".json");
+        jsonFile.open("/Users/ederson/projetos/ufabc/tgrafos/teoriagrafos/benchmark_jsons/benchmark_exato_" + to_string(i) + ".json");
         if(jsonFile.is_open()){
             jsonFile << benchmarkResults;
             jsonFile.close();
         }else{
             std::cout << "ops nao foi possível abrir o json\n";
         }
+
 
     }
 }
