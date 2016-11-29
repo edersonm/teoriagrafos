@@ -6,6 +6,7 @@
 #include "Util.h"
 #include <algorithm>
 
+
 using namespace std;
 #define minDegree(v,n) ((Util::Vertex) *(v+n-1)).degree
 #define maxDegree(v) ((Util::Vertex) *v).degree
@@ -22,19 +23,6 @@ std::vector<Util::Vertex> parallelFindClique(Util::Vertex* vertexArray, int l,in
             return clique;
         }
         return {};
-}
-
-bool isCliqueAlreadyFound(int maxDegree){
-    if(clique_found){
-        for(int i=0; i<3; i++){
-            if(maxDegree < currentMaxSize[i])
-                return false;
-            else
-                return true;
-        }
-    }
-    return false;
-
 }
 
 std::vector<Util::Vertex> Exato::exato(Util::Vertex* vertexArray, int n){
@@ -77,12 +65,12 @@ std::vector<Util::Vertex> Exato::exato(Util::Vertex* vertexArray, int n){
         --d;
         defineWorkingSet(vertexArray, l, d);
         std::future<std::vector<Util::Vertex>> ret1 = std::async(parallelFindClique,vertexArray,l,d);
-        currentMaxSize[1] = d;
 
+        if(d < 1)
+            return {};
         --d;
         defineWorkingSet(vertexArray, l, d);
         std::future<std::vector<Util::Vertex>> ret2 = std::async(parallelFindClique,vertexArray,l,d);
-        currentMaxSize[2] = d;
 
         auto clique = ret.get();
         if(!clique.empty()){
@@ -115,7 +103,8 @@ std::vector<Util::Vertex> Exato::findClique(Util::Vertex* vertexArray, int l, in
 
 
 void Exato::subsets(Util::Vertex* vertexArray, int n, int k, int start, int currentLength, bool* used, bool* found, std::vector<Util::Vertex>* result){
-    if(isCliqueAlreadyFound(k)) return;
+
+    if(clique_found) return;
     if(currentLength == k && !*found){
         std::vector<Util::Vertex> subset;
         subset.reserve(k);
@@ -138,11 +127,13 @@ void Exato::subsets(Util::Vertex* vertexArray, int n, int k, int start, int curr
         return;
     }
 
+
     used[start] = true;
     Exato::subsets(vertexArray, n, k, start + 1, currentLength + 1, used, found, result);
 
     used[start] = false;
     Exato::subsets(vertexArray, n, k, start + 1, currentLength, used, found, result);
+
     return;
 }
 
